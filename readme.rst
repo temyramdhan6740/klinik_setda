@@ -1,5 +1,5 @@
 ###################
-SIMRS RAWAT INAP (E-REKAMEDIK)
+KLINIK SETDA
 ###################
 
 -  Clone Repository
