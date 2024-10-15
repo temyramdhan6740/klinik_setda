@@ -843,6 +843,14 @@
 					return;
 				}
 				let response = data.response;
+				let totalSeluruhBiaya = 0;
+
+				// total seluruh biaya
+				$.each(response, function(i, v){
+					totalSeluruhBiaya += parseInt(v.total_biaya);
+				})
+				$(".total-seluruh-biaya div:eq(1)").text('Rp. ' + totalSeluruhBiaya.toLocaleString('id-ID'));
+
 				tableListRekap.clear().draw();
 				$.each(response, function(i, v) {
 					tableListRekap.row.add([

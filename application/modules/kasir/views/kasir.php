@@ -410,25 +410,29 @@
  						<input type="search" name="searach_list_rekap" placeholder="Search..." class="form-control form-control-sm">
  					</div>
  					<div style="overflow-x: scroll;">
-						 <table class="table table-sm table-striped table-bordered border border-top w-100" id="table-list-rekap">
-							 <thead>
-								 <tr>
-									 <th>No RM</th>
-									 <th>Nama</th>
-									 <th>Antrian</th>
-									 <th>Biro</th>
-									 <th>Waktu Registrasi</th>
-									 <th>Dokter</th>
-									 <th>Poli</th>
-									 <th>Total Biaya</th>
-									 <th></th>
-								 </tr>
-							 </thead>
-							 <tbody></tbody>
-						 </table>
+ 						<table class="table table-sm table-striped table-bordered border border-top w-100" id="table-list-rekap">
+ 							<thead>
+ 								<tr>
+ 									<th>No RM</th>
+ 									<th>Nama</th>
+ 									<th>Antrian</th>
+ 									<th>Biro</th>
+ 									<th>Waktu Registrasi</th>
+ 									<th>Dokter</th>
+ 									<th>Poli</th>
+ 									<th>Total Biaya</th>
+ 									<th></th>
+ 								</tr>
+ 							</thead>
+ 							<tbody></tbody>
+ 						</table>
  					</div>
+					 <div class="row m-0 mt-2 py-2 justify-content-start text-center fw-bold fs-6 total-seluruh-biaya" style="background: #FFE78B;">
+						 <div class="col-12 col-md-6">Total Seluruh Biaya</div>
+						 <div class="col-12 col-md-6">Rp. 0</div>
+					 </div>
  				</div>
-				<div class="card-footer p-0"></div>
+ 				<div class="card-footer p-0"></div>
  			</div>
  		</div>
  	</div>
