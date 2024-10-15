@@ -3,6 +3,7 @@
 <link href="<?= base_url('assets/plugins/datatables/datatable.css') ?>" rel="stylesheet">
 <link href="<?= base_url('assets/plugins/flatpickr/dist/flatpickr.min.css') ?>" rel="stylesheet">
 <link href="<?= base_url('assets/plugins/flatpickr/dist/themes/airbnb.css') ?>" rel="stylesheet">
+<link href="<?= base_url() ?>assets/plugins/daterangepicker/daterangepicker.css" rel="stylesheet">
 
 <style>
 	table {
@@ -71,11 +72,21 @@
 		font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 	}
 
-	#table-list-tindakan tbody tr td:last-child {
+	/* Table Tindakan */
+
+	#table-list-tindakan-checkout tbody tr td:last-child {
 		padding: 0 !important;
 	}
 
-	#table-list-tindakan_filter {
+	#table-list-tindakan-checkout_filter {
+		display: none !important;
+	}
+
+	#table-list-tindakan-keranjang_filter {
+		display: none !important;
+	}
+
+	#table-list-tindakan-keranjang_length {
 		display: none !important;
 	}
 
@@ -87,15 +98,84 @@
 		margin-bottom: 1em !important;
 	}
 
-	#table-list-tindakan-keranjang_filter {
+	/* End Table Tindakan */
+
+	/* Table Resep */
+
+	#table-list-resep tbody tr td:last-child {
+		padding: 0 !important;
+	}
+
+	#table-list-resep_filter {
 		display: none !important;
 	}
 
-	#table-list-tindakan-keranjang_length {
+	#table-list-resep-keranjang_filter {
+		display: none !important;
+	}
+
+	#table-list-rekap_filter {
+		display: none !important;
+	}
+
+	#table-list-rekap_length {
+		display: none !important;
+	}
+
+	#table-list-rekap td {
+		white-space: nowrap;
+	}
+
+	#table-list-resep-keranjang_length {
+		display: none !important;
+	}
+
+	#table-keranjang-resep tbody tr td {
+		/* padding: 0 !important; */
+		white-space: nowrap;
+	}
+
+	/* End Table Resep */
+
+	#table-list-data-pasien tbody tr td:nth-child(1) {
+		padding: 0 !important;
+	}
+
+	.dataTables_filter {
+		margin-bottom: 1em !important;
+	}
+
+	#table-list-antrian_filter {
+		display: none !important;
+	}
+
+	#table-list-antrian_length {
 		display: none !important;
 	}
 
 	.total-pembayaran .card-body div {
 		font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+	}
+
+	.buttons-html5 {
+        font-size: 12px;
+        padding-top: 5px;
+        padding-bottom: 5px;
+        border-radius: 0 !important;
+		border: 1px solid;
+        background: #007bff linear-gradient(180deg, rgba(52, 162, 78, 1), rgba(52, 137, 78, 1)) repeat-x !important;
+    }
+
+    .buttons-print {
+        font-size: 12px;
+        padding-top: 5px;
+        padding-bottom: 5px;
+        border-radius: 0 !important;
+		border: 1px solid;
+        background: #007bff linear-gradient(180deg, rgba(52, 162, 78, 1), rgba(52, 137, 78, 1)) repeat-x !important;
+    }
+
+	.content-2 .card-footer .dt-buttons {
+		width: 100%;
 	}
 </style>
