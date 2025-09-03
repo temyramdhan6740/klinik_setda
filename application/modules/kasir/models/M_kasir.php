@@ -22,15 +22,21 @@ class M_kasir extends CI_Model
 		return $this->simrs->get('vwTindakanSetDA');
 	}
 
-	public function getTindakanByStruk($struk)
+	public function getTindakanByStruk($struk, $payCode)
 	{
 		$this->db->where('no_struck', $struk);
+		if ($payCode != NULL) {
+			$this->db->where('payment_code', $payCode);
+		}
 		return $this->db->get('tb_tindakan_perda');
 	}
-
-	public function getResepByStruk($struk)
+	
+	public function getResepByStruk($struk, $payCode)
 	{
 		$this->db->where('no_struck', $struk);
+		if ($payCode != NULL) {
+			$this->db->where('payment_code', $payCode);
+		}
 		return $this->db->get('tb_trans_resep_detail');
 	}
 
@@ -66,10 +72,14 @@ class M_kasir extends CI_Model
 		return $this->db->get('tb_dokter');
 	}
 
-	public function getPay_ByStruk($struk, $tranType)
+	public function getPay_ByStruk($struk, $tranType, $payCode = NULL)
 	{
 		$this->db->where('struck_no', $struk);
 		$this->db->where('tran_type', $tranType);
+		if ($payCode != NULL) {
+			$this->db->where('payment_code', $payCode);
+		}
+		$this->db->order_by('id', 'DESC');
 		return $this->db->get('tb_payment');
 	}
 
@@ -87,15 +97,18 @@ class M_kasir extends CI_Model
 		$this->db->trans_start();
 		$data['updated_by'] = $this->session->userdata('id');
 		$data['updated_date'] = date('Y-m-d H:i:s');
-		if ($getData->num_rows() > 0) {
-			$this->db->where('struck_no', $data['struck_no']);
-			$this->db->where('tran_type', $data['tran_type']);
-			$this->db->update('tb_payment', $data);
-		} else {
-			$data['created_by'] = $this->session->userdata('id');
-			$data['created_date'] = date('Y-m-d H:i:s');
-			$this->db->insert('tb_payment', $data);
-		}
+		// if ($getData->num_rows() > 0) {
+		// 	$this->db->where('struck_no', $data['struck_no']);
+		// 	$this->db->where('tran_type', $data['tran_type']);
+		// 	$this->db->update('tb_payment', $data);
+		// } else {
+		// 	$data['created_by'] = $this->session->userdata('id');
+		// 	$data['created_date'] = date('Y-m-d H:i:s');
+		// 	$this->db->insert('tb_payment', $data);
+		// }
+		$data['created_by'] = $this->session->userdata('id');
+		$data['created_date'] = date('Y-m-d H:i:s');
+		$this->db->insert('tb_payment', $data);
 		$this->db->trans_complete();
 
 		if ($this->db->trans_status() === FALSE) {
@@ -154,6 +167,23 @@ class M_kasir extends CI_Model
 
 		$this->db->trans_start();
 		$this->db->update_batch('tb_tindakan_perda', $data, 'id');
+		$this->db->trans_complete();
+
+		if ($this->db->trans_status() === FALSE) {
+			$this->db->trans_rollback();
+			return 0;
+		} else {
+			$this->db->trans_commit();
+			return 1;
+		}
+	}
+
+	public function updateResep($data)
+	{
+		$this->db->trans_start();
+		$this->db->where('no_struck', $data['no_struck']);
+		$this->db->where('payment_code IS NULL');
+		$this->db->update('tb_trans_resep_detail', $data);
 		$this->db->trans_complete();
 
 		if ($this->db->trans_status() === FALSE) {
@@ -237,21 +267,12 @@ class M_kasir extends CI_Model
 			c.nama_dokter,
 			c.dokter_code,
 			d.nama_poli,
-			d.kode_poli,
-			p.payment_code,
-			p.tran_type,
-			p.payment_type,
-			p.amount_total,
-			p.amount_total_rounding,
-			p.amount_paid,
-			p.amount_change,
-			p.amount_outstanding,
-			p.deleted
+			d.kode_poli
 		");
 		$this->db->join("tb_pasien b", "a.no_rm = b.no_rm", "left");
 		$this->db->join("tb_dokter c", "a.dokter_code = c.dokter_code", "left");
 		$this->db->join("tb_poli d", "a.kode_poli = d.kode_poli", "left");
-		$this->db->join("tb_payment p", "a.no_struck = p.struck_no", "left");
+		// $this->db->join("tb_payment p", "a.no_struck = p.struck_no", "left");
 		$this->db->where("(a.status <> '3' and a.status IS NOT NULL)");
 		$this->db->order_by("a.antrian", "ASC");
 	}

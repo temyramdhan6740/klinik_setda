@@ -19,6 +19,7 @@
 	var baseURL = "<?= base_url() ?>";
 	var rawTindakanDB = [];
 	var rawResepDB = [];
+	var rawGetRM = {};
 
 	$('[datetime-picker]').daterangepicker({
 		"showDropdowns": true,
@@ -306,6 +307,11 @@
 	});
 
 	$('#btn-checkout-pay').on('click', function() {
+		const jmhTotal = parseFloat($(".total-pembayaran-keranjang .total-seluruh").text().replace(/[Rp.\s]/g, ''));
+		if (jmhTotal == 0) {
+			toastr.error('Total keranjang masih kosong');
+			return false;
+		}
 		$.ajax({
 			url: baseURL + 'kasir/api/get_payment',
 			type: 'POST',
@@ -337,8 +343,8 @@
 	});
 
 	$('#btn-confirm-checkout').on('click', function() {
-		let jmhTotal = parseFloat($(".biaya-total-seluruh").text().replace(/[Rp.\s]/g, ''));
-		let pembulatan = parseFloat($(".pembulatan").text().replace(/[Rp.\s]/g, ''));
+		let jmhTotal = parseFloat($(".total-pembayaran-keranjang .biaya-total-seluruh").text().replace(/[Rp.\s]/g, ''));
+		let pembulatan = parseFloat($(".total-pembayaran-keranjang .pembulatan").text().replace(/[Rp.\s]/g, ''));
 		$.ajax({
 			url: baseURL + 'kasir/api/confirm_checkout',
 			type: 'POST',
@@ -369,7 +375,10 @@
 					toastr.error(data.metaData.message);
 					return;
 				}
-				simpanTindakanPerda();
+				simpanTindakanPerda(data.response.payment_code);
+				simpanResep();
+				// if (rawGetRM.response.data_payment == null) {
+				// }
 				$("#modal-checkout-pay").modal('hide');
 				$('#btn-confirm-checkout').prop('disabled', false);
 				getRM($('[name="struck_no"]').val());
@@ -382,6 +391,51 @@
 				console.log(jqXHR + textStatus + errorThrown);
 			}
 		})
+	});
+
+	$("#btn-cetak-pay").on("click", function() {
+		$.ajax({
+			url: baseURL + 'kasir/api/get_list_payment',
+			type: 'POST',
+			data: {
+				struck_no: $('[name="struck_no"]').val(),
+				tran_type: 'Rawat Jalan'
+			},
+			dataType: 'json',
+			beforeSend: function() {
+				$("#btn-cetak-pay").prop('disabled', true);
+			},
+			success: function(data) {
+				if (data.metaData.code != 200) {
+					$("#modal-cetak-pay").modal('hide')
+					toastr.error(data.metaData.message);
+					return false;
+				}
+
+				$('.list-faktur').html(null);
+				$.each(data.response, function(i, v) {
+					$('.list-faktur').append(`
+						<div class="col-lg-2 p-1 sub" onclick="cetak_pembayaran('${v.payment_code}')">
+ 							<div class="border border-primary p-1 px-2 rounded shadow-sm">
+ 								<div class="text-xs fw-bold">${v.payment_code}</div>
+ 								<div class="text-xs">${v.created_date}</div>
+ 								<div class="text-xs text-end">${v.created_by}</div>
+ 							</div>
+ 						</div>
+					`);
+				})
+				$("#modal-cetak-pay").modal('show')
+			},
+			complete: function() {
+				$("#btn-cetak-pay").prop('disabled', false);
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				$("#btn-cetak-pay").prop('disabled', false);
+				$("#modal-cetak-pay").modal('hide')
+				toastr.error("Maaf ada kesalahan teknis.")
+				console.log(jqXHR + textStatus + errorThrown);
+			}
+		});
 	});
 
 	function pilihTindakanPerda(actCode) {
@@ -472,7 +526,7 @@
 						console.log(0);
 						console.log(text);
 						updateSubtotal_KeranjangTindakan(response.actcode);
-						calculateTotal()
+						calculateTotal('pilih_tindakan')
 					});
 
 					// Event listener untuk tombol hapus
@@ -480,12 +534,12 @@
 						const tindakanCode = $(this).closest('tr').attr('kode-tindakan');
 						rawTindakanDB = rawTindakanDB.filter(item => item.tindakan_code !== tindakanCode);
 						$(this).closest('tr').remove();
-						calculateTotal()
+						calculateTotal('pilih_tindakan')
 					});
 
 					// Perbarui subtotal untuk item baru
 					updateSubtotal_KeranjangTindakan(response.actcode);
-					calculateTotal();
+					calculateTotal('pilih_tindakan');
 
 					$("#modal-list-tindakan").modal('hide')
 					return;
@@ -532,7 +586,7 @@
 		row.find('.subtotal').text('Rp. ' + subtotal.toLocaleString('id-ID'));
 	}
 
-	function calculateTotal() {
+	function calculateTotal(act = null) {
 
 		let total_Tindakan = 0;
 		$.each(rawTindakanDB, function(i, v) {
@@ -540,31 +594,34 @@
 			total_Tindakan += subtotal;
 		});
 
-		// $('#table-keranjang-tindakan tbody tr').each(function() {
-		// 	let subtotalText = $(this).find('.subtotal').text().trim().replace('Rp. ', '').replaceAll('.', '');
-		// 	let subtotal = parseFloat(subtotalText);
-		// 	total_Tindakan += subtotal;
-		// });
-
 		let total_Resep = 0;
 		$.each(rawResepDB, function(i, v) {
 			total_Resep += Number(v.subtotal);
 		});
 
-		// $('#table-keranjang-resep tbody tr').each(function() {
-		// 	let subtotalText = $(this).find('.subtotal').text().trim().replace('Rp. ', '').replaceAll('.', '');
-		// 	let subtotal = parseFloat(subtotalText);
-		// 	total_Resep += subtotal;
-		// });
-
 		let total_Seluruh = (total_Tindakan + total_Resep);
 		let total_Pembulatan = Math.round(total_Seluruh / 1000) * 1000;
 
-		$('.biaya-tindakan').text('Rp. ' + total_Tindakan.toLocaleString('id-ID'));
-		$('.biaya-obat').text('Rp. ' + total_Resep.toLocaleString('id-ID'));
-		$('.biaya-total-seluruh').text('Rp. ' + total_Seluruh.toLocaleString('id-ID'));
-		$('.pembulatan').text('Rp. ' + total_Pembulatan.toLocaleString('id-ID'));
-		$('.total-seluruh').text('Rp. ' + total_Pembulatan.toLocaleString('id-ID'));
+		let total_Keranjang = 0;
+		$.each(getTindakanTable(), function(i, v) {
+			total_Keranjang += Number(v.subtotal.replace(/[^0-9]/g, ''));
+		});
+
+		if (act == 'pilih_tindakan') {
+			$('.total-pembayaran-keranjang .total-seluruh').text('Rp. ' + total_Keranjang.toLocaleString('id-ID'));
+			$('.total-pembayaran-keranjang .biaya-total-seluruh').text('Rp. ' + total_Keranjang.toLocaleString('id-ID'));
+			if (rawGetRM.response.data_payment == null) {
+				$('.total-pembayaran-keranjang .total-seluruh').text('Rp. ' + total_Pembulatan.toLocaleString('id-ID'));
+				$('.total-pembayaran-keranjang .biaya-total-seluruh').text('Rp. ' + total_Seluruh.toLocaleString('id-ID'));
+			}
+			return false;
+		}
+
+		$('.total-pembayaran .biaya-tindakan').text('Rp. ' + total_Tindakan.toLocaleString('id-ID'));
+		$('.total-pembayaran .biaya-obat').text('Rp. ' + total_Resep.toLocaleString('id-ID'));
+		$('.total-pembayaran .biaya-total-seluruh').text('Rp. ' + total_Seluruh.toLocaleString('id-ID'));
+		$('.total-pembayaran .pembulatan').text('Rp. ' + total_Pembulatan.toLocaleString('id-ID'));
+		$('.total-pembayaran .total-seluruh').text('Rp. ' + total_Pembulatan.toLocaleString('id-ID'));
 	}
 
 	function getRM(struk) {
@@ -596,6 +653,8 @@
 
 				rawTindakanDB.length = 0;
 				rawResepDB.length = 0;
+				rawGetRM.metaData = data.metaData;
+				rawGetRM.response = data.response;
 				tableListTindakanCheckout.clear().draw();
 
 				let response = data.response;
@@ -609,7 +668,8 @@
 				$('[name="poli_antrian"]').val(response_RM.kode_poli);
 				panggilTindakanPerda_ByStruk(response_RM.no_struck, response);
 				panggilResep_ByStruk(response_RM.no_struck);
-				$('.kode-pembayaran').text(response.data_generate_payment);
+				$('.total-pembayaran .kode-pembayaran').text(response_Pay?.payment_code);
+				calculateTotal();
 				// panggilPembayaran(response, response.data_generate_payment);
 			},
 			complete: function() {},
@@ -625,7 +685,8 @@
 			url: baseURL + 'kasir/api/get_tindakan_perda_by_struk',
 			type: 'POST',
 			data: {
-				struck_no: struckNo
+				struck_no: struckNo,
+				payment_code: (typeof(rawGetRM.response.data_payment?.payment_code) === "undefined") ? null : rawGetRM.response.data_payment.payment_code
 			},
 			dataType: 'json',
 			async: false,
@@ -693,7 +754,8 @@
 			url: baseURL + 'kasir/api/get_resep_by_struk',
 			type: 'POST',
 			data: {
-				struck_no: struckNo
+				struck_no: struckNo,
+				payment_code: (typeof(rawGetRM.response.data_payment?.payment_code) === "undefined") ? null : rawGetRM.response.data_payment.payment_code
 			},
 			dataType: 'json',
 			async: false,
@@ -750,7 +812,7 @@
 	}
 
 	function panggilCheckout() {
-		let totalSeluruh = parseFloat($(".total-seluruh").text().replace(/[Rp.\s]/g, ''));
+		let totalSeluruh = parseFloat($(".total-pembayaran-keranjang .total-seluruh").text().replace(/[Rp.\s]/g, ''));
 		let kalkulasiKembalian = $('[name="checkout_paid"]').val() - totalSeluruh;
 		$('[data-amount-change]').text(kalkulasiKembalian.toLocaleString('id-ID')).attr('data-amount-change', kalkulasiKembalian)
 		$('[data-amount-outstanding]').text(0).attr('data-amount-outstanding', 0)
@@ -797,7 +859,7 @@
 
 
 
-	function simpanTindakanPerda() {
+	function simpanTindakanPerda(paymentCode) {
 		$.ajax({
 			url: baseURL + 'kasir/api/simpan_tindakan',
 			type: 'POST',
@@ -805,7 +867,8 @@
 				struck_no: $('[name="struck_no"]').val(),
 				cust_code: $('[name="cust_code"]').val(),
 				data_non_db: JSON.stringify(getTindakanTable()),
-				data_db: JSON.stringify(getTindakanTable_FromDB())
+				data_db: JSON.stringify(getTindakanTable_FromDB()),
+				payment_code: paymentCode
 			},
 			dataType: 'json',
 			beforeSend: function() {
@@ -819,6 +882,31 @@
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
 				toastr.error("Maaf ada kesalahan teknis pada simpan tindakan.")
+				console.log(jqXHR + textStatus + errorThrown);
+			}
+		})
+	}
+
+	function simpanResep() {
+		$.ajax({
+			url: baseURL + 'kasir/api/simpan_resep',
+			type: 'POST',
+			data: {
+				struck_no: $('[name="struck_no"]').val(),
+				cust_code: $('[name="cust_code"]').val()
+			},
+			dataType: 'json',
+			beforeSend: function() {
+				// $('[name="btn_tambah_tindakan"]').prop('disabled', true);
+			},
+			success: function(data) {
+				if (data.metaData.code != 200) {
+					toastr.error(data.metaData.message);
+					return;
+				}
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				toastr.error("Maaf ada kesalahan teknis pada simpan resep.")
 				console.log(jqXHR + textStatus + errorThrown);
 			}
 		})
@@ -846,7 +934,7 @@
 				let totalSeluruhBiaya = 0;
 
 				// total seluruh biaya
-				$.each(response, function(i, v){
+				$.each(response, function(i, v) {
 					totalSeluruhBiaya += parseInt(v.total_biaya);
 				})
 				$(".total-seluruh-biaya div:eq(1)").text('Rp. ' + totalSeluruhBiaya.toLocaleString('id-ID'));
@@ -905,13 +993,20 @@
 		return exports;
 	}
 
-	function cetak_pembayaran() {
-		let struk = $('[name="struck_no"]').val();
+	function cetak_pembayaran(payCode = null) {
+		let data = {
+			struk: $('[name="struck_no"]').val(),
+			paymentCode: (payCode == null) ? null : payCode.replaceAll('/', '-')
+		}
 		let width = 559;
 		let height = 794;
 		const left = (window.screen.width / 2) - (width / 2);
 		const top = (window.screen.height / 2) - (height / 2);
-		if (struk == '') return;
-		window.open(baseURL + 'kasir/cetak_pembayaran/' + struk, '_blank', `location=yes,height=${height},width=${width},scrollbars=yes,status=yes,top=${top},left=${left}`);
+		if (data.struk == '') return;
+		if (payCode == null) {
+			window.open(baseURL + 'kasir/cetak_pembayaran/' + data.struk, '_blank', `location=yes,height=${height},width=${width},scrollbars=yes,status=yes,top=${top},left=${left}`);
+			return false;
+		}
+		window.open(baseURL + 'kasir/cetak_pembayaran/' + data.struk + '/' + data.paymentCode, '_blank', `location=yes,height=${height},width=${width},scrollbars=yes,status=yes,top=${top},left=${left}`);
 	}
 </script>

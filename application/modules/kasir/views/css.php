@@ -157,25 +157,47 @@
 		font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 	}
 
-	.buttons-html5 {
-        font-size: 12px;
-        padding-top: 5px;
-        padding-bottom: 5px;
-        border-radius: 0 !important;
-		border: 1px solid;
-        background: #007bff linear-gradient(180deg, rgba(52, 162, 78, 1), rgba(52, 137, 78, 1)) repeat-x !important;
-    }
+	.total-pembayaran-keranjang .card-body div {
+		font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+	}
 
-    .buttons-print {
-        font-size: 12px;
-        padding-top: 5px;
-        padding-bottom: 5px;
-        border-radius: 0 !important;
+	.buttons-html5 {
+		font-size: 12px;
+		padding-top: 5px;
+		padding-bottom: 5px;
+		border-radius: 0 !important;
 		border: 1px solid;
-        background: #007bff linear-gradient(180deg, rgba(52, 162, 78, 1), rgba(52, 137, 78, 1)) repeat-x !important;
-    }
+		background: #007bff linear-gradient(180deg, rgba(52, 162, 78, 1), rgba(52, 137, 78, 1)) repeat-x !important;
+	}
+
+	.buttons-print {
+		font-size: 12px;
+		padding-top: 5px;
+		padding-bottom: 5px;
+		border-radius: 0 !important;
+		border: 1px solid;
+		background: #007bff linear-gradient(180deg, rgba(52, 162, 78, 1), rgba(52, 137, 78, 1)) repeat-x !important;
+	}
 
 	.content-2 .card-footer .dt-buttons {
 		width: 100%;
+	}
+
+	.list-faktur .sub {
+		cursor: pointer;
+	}
+
+	.list-faktur .sub .text-xs {
+		font-family: monospace !important;
+	}
+
+	.list-faktur .sub div:hover {
+		color: #fff;
+		background-color: rgba(52, 137, 78, 1);
+		/* border-radius: 0.375rem; */
+	}
+
+	.monospace {
+		font-family: monospace !important;
 	}
 </style>

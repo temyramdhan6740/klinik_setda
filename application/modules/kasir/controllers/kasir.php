@@ -29,13 +29,14 @@ class Kasir extends MX_Controller
 		die;
 	}
 
-	public function cetak_pembayaran($struk)
+	public function cetak_pembayaran($struk, $paymentCode = NULL)
 	{
+		$paymentCode = str_replace('-', '/', $paymentCode);
 		$getData = $this->kasir->getRM($struk);
-		$getData_Tindakan = $this->kasir->getTindakanByStruk($struk);
-		$getData_Resep = $this->kasir->getResepByStruk($struk);
+		$getData_Tindakan = $this->kasir->getTindakanByStruk($struk, $paymentCode);
+		$getData_Resep = $this->kasir->getResepByStruk($struk, $paymentCode);
 		$getData_LastPayment = $this->kasir->getLastPay();
-		$getData_Payment = $this->kasir->getPay_ByStruk($struk, 'Rawat Jalan');
+		$getData_Payment = $this->kasir->getPay_ByStruk($struk, 'Rawat Jalan', $paymentCode);
 
 		$data['data_rm'] = $getData->row();
 		$data['data_tindakan'] = array(

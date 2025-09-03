@@ -159,7 +159,7 @@ class Api extends MX_Controller
 
 	public function get_tindakan_perda_by_struk()
 	{
-		$getData = $this->kasir->getTindakanByStruk($_POST['struck_no']);
+		$getData = $this->kasir->getTindakanByStruk($_POST['struck_no'], $_POST['payment_code']);
 		if ($getData->num_rows() > 0) {
 			echo json_encode($this->ResponseAPI(200, 'success', $getData->result()));
 			die;
@@ -170,7 +170,7 @@ class Api extends MX_Controller
 
 	public function get_resep_by_struk()
 	{
-		$getData = $this->kasir->getResepByStruk($_POST['struck_no']);
+		$getData = $this->kasir->getResepByStruk($_POST['struck_no'], $_POST['payment_code']);
 		if ($getData->num_rows() > 0) {
 			echo json_encode($this->ResponseAPI(200, 'success', $getData->result()));
 			die;
@@ -181,13 +181,14 @@ class Api extends MX_Controller
 
 	public function confirm_checkout()
 	{
+		$generatePayCode = $this->generate_payment_code($_POST['struck_no']);
 		if ($_POST['amount_paid'] == "") {
 			echo json_encode($this->ResponseAPI(202, 'Jumlah pembayaran kosong'));
 			die;
 		}
 
 		$data = array(
-			"payment_code" => $this->generate_payment_code($_POST['struck_no']),
+			"payment_code" => $generatePayCode,
 			"cust_code" => $_POST['cust_code'],
 			"struck_no" => $_POST['struck_no'],
 			"tran_type" => "Rawat Jalan",
@@ -203,70 +204,106 @@ class Api extends MX_Controller
 		if ($query == 0) {
 			$return = $this->ResponseAPI(201, 'Ada masalah saat input data.', $_POST);
 		} else {
-			$return = $this->ResponseAPI(200, 'Sukses', $_POST);
+			$return = $this->ResponseAPI(200, 'Sukses', $data);
 		}
 		echo json_encode($return);
 	}
 
 	public function simpan_tindakan()
 	{
-		$result_non_db = array();
-		$result_db = array();
+		if ($this->input->is_ajax_request()) {
+			$result_non_db = array();
+			$result_db = array();
 
-		// Data Non DB
-		$data_non_db = json_decode($_POST['data_non_db']);
-		foreach ($data_non_db as $req) {
-			$row = array(
+			// Data Non DB
+			$data_non_db = json_decode($_POST['data_non_db']);
+			foreach ($data_non_db as $req) {
+				$row = array(
+					'no_struck' => $_POST['struck_no'],
+					'no_rm' => $_POST['cust_code'],
+					'tindakan_code' => $req->act_code,
+					'nama_tindakan' => $req->nama_tindakan,
+					'harga' => intval(str_replace(['Rp.', ' ', '.'], '', $req->price)),
+					'created_by' => $this->session->userdata('id'),
+					'is_paid' => 1,
+					'tran_date' => date('Y-m-d H:i:s'),
+					'payment_code' => $_POST['payment_code']
+				);
+				$result_non_db[] = $row;
+			}
+
+			// Data DB
+			$data_db = json_decode($_POST['data_db']);
+			foreach ($data_db as $req) {
+				$row = array(
+					'id' => $req->id,
+					'created_by' => $this->session->userdata('id'),
+					'is_paid' => 1,
+					'tran_date' => date('Y-m-d H:i:s'),
+					'payment_code' => $_POST['payment_code']
+				);
+				$result_db[] = $row;
+			}
+
+			$query = $this->kasir->insertTindakan($result_non_db);
+			if ($query == 0) {
+				$return = $this->ResponseAPI(201, 'Ada masalah saat input tindakan.', $_POST);
+			}
+
+			$query_db = $this->kasir->updateTindakan($result_db);
+			if ($query_db == 0) {
+				$return = $this->ResponseAPI(201, 'Ada masalah saat update tindakan.', $_POST);
+			} else {
+				$return = $this->ResponseAPI(200, 'Sukses', array(
+					'insert' => $result_non_db,
+					'update' => $result_db
+				));
+			}
+			echo json_encode($return);
+		}
+	}
+
+	public function simpan_resep()
+	{
+		if ($this->input->is_ajax_request()) {
+			$data = array(
 				'no_struck' => $_POST['struck_no'],
-				'no_rm' => $_POST['cust_code'],
-				'tindakan_code' => $req->act_code,
-				'nama_tindakan' => $req->nama_tindakan,
-				'harga' => intval(str_replace(['Rp.', ' ', '.'], '', $req->price)),
-				'created_by' => $this->session->userdata('id'),
-				'is_paid' => 1,
-				'tran_date' => date('Y-m-d H:i:s')
+				'payment_code' => $this->generate_payment_code($_POST['struck_no'])
 			);
-			$result_non_db[] = $row;
+			$query_db = $this->kasir->updateResep($data);
+			if ($query_db == 0) {
+				$return = $this->ResponseAPI(201, 'Ada masalah saat update resep.', $_POST);
+			} else {
+				$return = $this->ResponseAPI(200, 'Sukses', $_POST);
+			}
+			echo json_encode($return);
 		}
-
-		// Data DB
-		$data_db = json_decode($_POST['data_db']);
-		foreach ($data_db as $req) {
-			$row = array(
-				'id' => $req->id,
-				'created_by' => $this->session->userdata('id'),
-				'is_paid' => 1,
-				'tran_date' => date('Y-m-d H:i:s')
-			);
-			$result_db[] = $row;
-		}
-
-		$query = $this->kasir->insertTindakan($result_non_db);
-		if ($query == 0) {
-			$return = $this->ResponseAPI(201, 'Ada masalah saat input tindakan.', $_POST);
-		}
-
-		$query_db = $this->kasir->updateTindakan($result_db);
-		if ($query_db == 0) {
-			$return = $this->ResponseAPI(201, 'Ada masalah saat update tindakan.', $_POST);
-		} else {
-			$return = $this->ResponseAPI(200, 'Sukses', array(
-				'insert' => $result_non_db,
-				'update' => $result_db
-			));
-		}
-		echo json_encode($return);
 	}
 
 	public function get_payment()
 	{
-		$getData = $this->kasir->getPay_ByStruk($_POST['struck_no'], $_POST['tran_type']);
-		if ($getData->num_rows() > 0) {
-			echo json_encode($this->ResponseAPI(200, 'success', $getData->row()));
+		if ($this->input->is_ajax_request()) {
+			$getData = $this->kasir->getPay_ByStruk($_POST['struck_no'], $_POST['tran_type']);
+			if ($getData->num_rows() > 0) {
+				echo json_encode($this->ResponseAPI(200, 'success', $getData->row()));
+				die;
+			}
+			echo json_encode($this->ResponseAPI(201, 'Data Tidak Ada'));
 			die;
 		}
-		echo json_encode($this->ResponseAPI(201, 'Data Tidak Ada'));
-		die;
+	}
+
+	public function get_list_payment()
+	{
+		if ($this->input->is_ajax_request()) {
+			$getData = $this->kasir->getPay_ByStruk($_POST['struck_no'], $_POST['tran_type']);
+			if ($getData->num_rows() > 0) {
+				echo json_encode($this->ResponseAPI(200, 'success', $getData->result()));
+				die;
+			}
+			echo json_encode($this->ResponseAPI(201, 'Data Tidak Ada'));
+			die;
+		}
 	}
 
 	// PRIVATE
@@ -279,11 +316,11 @@ class Api extends MX_Controller
 
 		$getData_LastPayment = ($this->kasir->getLastPay()->num_rows() > 0) ? (intval($this->kasir->getLastPay()->row()->id) + 1) : 1;
 		$lastPayment_Result = sprintf('%05d', $getData_LastPayment);
-		$getData_Payment = $this->kasir->getPay_ByStruk($struckNo, $tranType);
-		if ($getData_Payment->num_rows() > 0) {
-			$payment_Result = sprintf('%05d', intval($getData_Payment->row()->id));
-			return $getData_Payment->row()->payment_code;
-		}
+		// $getData_Payment = $this->kasir->getPay_ByStruk($struckNo, $tranType);
+		// if ($getData_Payment->num_rows() > 0) {
+		// 	$payment_Result = sprintf('%05d', intval($getData_Payment->row()->id));
+		// 	return $getData_Payment->row()->payment_code;
+		// }
 		return "P/RJ/{$dateNow}/{$lastPayment_Result}";
 	}
 

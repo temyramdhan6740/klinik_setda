@@ -77,6 +77,10 @@
 		section.content tfoot tr td:nth-child(3) {
 			text-align: right;
 		}
+
+		.monospace {
+			font-family: monospace !important;
+		}
 	</style>
 </head>
 
@@ -94,7 +98,7 @@
 				<th class="text-sm">
 					<div style="text-align: center; width: 100%;">
 						<div>No Medrek</div>
-						<div style="border: 1px solid; padding: 0.2rem"><?= @$data_rm->no_rm ?></div>
+						<div class="monospace" style="border: 1px solid; padding: 0.2rem"><?= @$data_rm->no_rm ?></div>
 					</div>
 				</th>
 			</tr>
@@ -170,7 +174,7 @@
 						<th width="85"></th>
 					</tr>
 				</thead>
-				<tbody>
+				<tbody class="monospace">
 					<?php foreach ($data_tindakan['data'] as $dTindakan) { ?>
 						<tr style="color: <?= (@$dTindakan->is_paid == 0) ? 'red' : 'black' ?>;">
 							<td><?= @$dTindakan->nama_tindakan ?></td>
@@ -201,7 +205,7 @@
 						<th></th>
 					</tr>
 				</thead>
-				<tbody>
+				<tbody class="monospace">
 					<?php foreach ($data_resep['data'] as $dtResep) { ?>
 						<tr>
 							<td><?= @$dtResep->nama_resep ?></td>
@@ -250,32 +254,32 @@
 						<tr>
 							<th style="text-align: left" width="150">Total (Sebelum Checkout)</th>
 							<td>:</td>
-							<td width="85"><span class="float-left" style="padding-left: 1rem;">Rp.</span> <?= @number_format($data_tindakan['total_sebelum_checkout'], 0, ",", ".") ?></td>
+							<td width="85" class="monospace"><span class="float-left" style="padding-left: 1rem;">Rp.</span> <?= @number_format($data_tindakan['total_sebelum_checkout'], 0, ",", ".") ?></td>
 						</tr>
 						<tr>
 							<th style="text-align: left" width="150">Jumlah Pembayaran</th>
 							<td>:</td>
-							<td width="85"><span class="float-left" style="padding-left: 1rem;">Rp.</span> <?= @number_format($data_pembayaran->amount_paid, 0, ",", ".") ?></td>
+							<td width="85" class="monospace"><span class="float-left" style="padding-left: 1rem;">Rp.</span> <?= @number_format($data_pembayaran->amount_paid, 0, ",", ".") ?></td>
 						</tr>
 						<tr>
 							<th style="text-align: left" width="150">Total Piutang</th>
 							<td>:</td>
-							<td width="85"><span class="float-left" style="padding-left: 1rem;">Rp.</span> <?= @number_format($data_pembayaran->amount_outstanding, 0, ",", ".") ?></td>
+							<td width="85" class="monospace"><span class="float-left" style="padding-left: 1rem;">Rp.</span> <?= @number_format($data_pembayaran->amount_outstanding, 0, ",", ".") ?></td>
 						</tr>
 						<tr>
 							<th style="text-align: left" width="150">Total Kembalian</th>
 							<td>:</td>
-							<td width="85"><span class="float-left" style="padding-left: 1rem;">Rp.</span> <?= @number_format($data_pembayaran->amount_change, 0, ",", ".") ?></td>
+							<td width="85" class="monospace"><span class="float-left" style="padding-left: 1rem;">Rp.</span> <?= @number_format($data_pembayaran->amount_change, 0, ",", ".") ?></td>
 						</tr>
 						<tr>
 							<th style="text-align: left" width="150">Biaya Administrasi</th>
 							<td>:</td>
-							<td width="85"><span class="float-left" style="padding-left: 1rem;">Rp.</span> 0</td>
+							<td width="85" class="monospace"><span class="float-left" style="padding-left: 1rem;">Rp.</span> 0</td>
 						</tr>
 						<tr>
 							<th style="text-align: left" width="150">Total</th>
 							<td>:</td>
-							<td width="85" class="fw-bold"><span class="float-left" style="padding-left: 1rem;">Rp.</span> <?= @number_format($data_total['total_seluruh'], 0, ",", ".") ?></td>
+							<td width="85" class="fw-bold monospace"><span class="float-left" style="padding-left: 1rem;">Rp.</span> <?= @number_format($data_total['total_seluruh'], 0, ",", ".") ?></td>
 						</tr>
 					</tbody>
 				</table>

@@ -295,49 +295,18 @@
  		<div class="col-lg-4 sub-2">
  			<div class="row">
 
- 				<!-- TOTAL PEMBAYARAN -->
+ 				<!-- TOTAL PEMBAYARAN (KERANJANG) -->
  				<div class="col-md-12 my-1">
- 					<div class="card total-pembayaran text-sm mb-2" style="background: #CFFFD0;">
+ 					<div class="card total-pembayaran-keranjang text-sm mb-2" style="background: #CFFFD0;">
  						<div class="card-header bg-primary rounded-top p-3 py-2">
- 							<h6 class="text-white mb-0">Total Pembayaran</h6>
- 						</div>
- 						<div class="card-body px-0 py-1">
-
- 							<div class="row justify-content-start m-0 px-2">
- 								<div class="col-12 col-md-5 pr-2">Kode Pembayaran</div>
- 								<div class="col fw-bold kode-pembayaran">P/RJ/YY/MM/XXXX</div>
- 							</div>
-
- 						</div>
- 						<div class="card-body px-0 py-1" style="background: #BCE8BD">
-
- 							<div class="row justify-content-start m-0 px-2">
- 								<div class="col-12 col-md-5 pr-2">Biaya Tindakan</div>
- 								<div class="col biaya-tindakan">Rp. 0</div>
- 							</div>
-
- 						</div>
- 						<div class="card-body px-0 py-1">
-
- 							<div class="row justify-content-start m-0 px-2">
- 								<div class="col-12 col-md-5">Biaya Obat</div>
- 								<div class="col biaya-obat">Rp. 0</div>
- 							</div>
-
- 						</div>
- 						<div class="card-body px-0 py-1" style="background: #BCE8BD">
-
- 							<div class="row justify-content-start m-0 px-2">
- 								<div class="col-12 col-md-5">Biaya Administrasi</div>
- 								<div class="col biaya-adm">Rp. 0</div>
- 							</div>
-
+ 							<h6 class="text-white fw-bold mb-0">Total Pembayaran</h6>
+ 							<i class="text-white text-xs">(Keranjang)</i>
  						</div>
  						<div class="card-body px-0 py-1">
 
  							<div class="row justify-content-start m-0 px-2">
  								<div class="col-12 col-md-5">Total Seluruh</div>
- 								<div class="col biaya-total-seluruh">Rp. 0</div>
+ 								<div class="col monospace biaya-total-seluruh">Rp. 0</div>
  							</div>
 
  						</div>
@@ -345,7 +314,7 @@
 
  							<div class="row justify-content-start m-0 px-2">
  								<div class="col-12 col-md-5">Pembulatan</div>
- 								<div class="col pembulatan">Rp. 0</div>
+ 								<div class="col monospace pembulatan">Rp. 0</div>
  							</div>
 
  						</div>
@@ -353,13 +322,13 @@
 
  							<div class="row m-0 py-2 justify-content-start text-center fw-bold fs-4" style="background: #FFE78B;">
  								<div class="col-12 col-md-6">Total</div>
- 								<div class="col-12 col-md-6 total-seluruh">Rp. 0</div>
+ 								<div class="col-12 col-md-6 monospace total-seluruh">Rp. 0</div>
  							</div>
 
  						</div>
  					</div>
  				</div>
- 				<!-- END TOTAL PEMBAYARAN -->
+ 				<!-- END TOTAL PEMBAYARAN (KERANJANG) -->
 
  				<!-- BTN CHECKOUT -->
  				<div class="col-md-12 my-1">
@@ -372,12 +341,79 @@
 
  				<!-- BTN CETAK PEMBAYARAN -->
  				<div class="col-md-12 my-1">
- 					<button type="button" class="btn btn-secondary btn-sm w-100" id="btn-cetak-pay" onclick="cetak_pembayaran()" disabled>
+ 					<button type="button" class="btn btn-secondary btn-sm w-100" id="btn-cetak-pay" disabled>
  						<i class="fas fa-money-bill-wave px-2"></i>
  						<span>Cetak Pembayaran</span>
  					</button>
  				</div>
  				<!-- END BTN CETAK PEMBAYARAN -->
+
+ 				<!-- TOTAL PEMBAYARAN (SUDAH CHECKOUT) -->
+ 				<div class="col-md-12 my-1">
+ 					<div class="card total-pembayaran text-sm mb-2" style="background: #CFFFD0;">
+ 						<div class="card-header bg-primary rounded-top p-3 py-2">
+ 							<h6 class="text-white fw-bold mb-0">Total Pembayaran</h6>
+ 							<i class="text-white text-xs">(Sudah Checkout)</i>
+ 						</div>
+ 						<div class="card-body px-0 py-1">
+
+ 							<div class="row justify-content-start m-0 px-2">
+ 								<div class="col-12 col-md-5 pr-2">Kode Pembayaran</div>
+ 								<div class="col monospace fw-bold kode-pembayaran">P/RJ/YY/MM/XXXX</div>
+ 							</div>
+
+ 						</div>
+ 						<div class="card-body px-0 py-1" style="background: #BCE8BD">
+
+ 							<div class="row justify-content-start m-0 px-2">
+ 								<div class="col-12 col-md-5 pr-2">Biaya Tindakan</div>
+ 								<div class="col monospace biaya-tindakan">Rp. 0</div>
+ 							</div>
+
+ 						</div>
+ 						<div class="card-body px-0 py-1">
+
+ 							<div class="row justify-content-start m-0 px-2">
+ 								<div class="col-12 col-md-5">Biaya Obat</div>
+ 								<div class="col monospace biaya-obat">Rp. 0</div>
+ 							</div>
+
+ 						</div>
+ 						<div class="card-body px-0 py-1" style="background: #BCE8BD">
+
+ 							<div class="row justify-content-start m-0 px-2">
+ 								<div class="col-12 col-md-5">Biaya Administrasi</div>
+ 								<div class="col monospace biaya-adm">Rp. 0</div>
+ 							</div>
+
+ 						</div>
+ 						<div class="card-body px-0 py-1">
+
+ 							<div class="row justify-content-start m-0 px-2">
+ 								<div class="col-12 col-md-5">Total Seluruh</div>
+ 								<div class="col monospace biaya-total-seluruh">Rp. 0</div>
+ 							</div>
+
+ 						</div>
+ 						<div class="card-body px-0 py-1" style="background: #BCE8BD">
+
+ 							<div class="row justify-content-start m-0 px-2">
+ 								<div class="col-12 col-md-5">Pembulatan</div>
+ 								<div class="col monospace pembulatan">Rp. 0</div>
+ 							</div>
+
+ 						</div>
+ 						<div class="card-footer p-0">
+
+ 							<div class="row m-0 py-2 justify-content-start text-center fw-bold fs-4" style="background: #FFE78B;">
+ 								<div class="col-12 col-md-6">Total</div>
+ 								<div class="col-12 col-md-6 monospace total-seluruh">Rp. 0</div>
+ 							</div>
+
+ 						</div>
+ 					</div>
+ 				</div>
+ 				<!-- END TOTAL PEMBAYARAN (SUDAH CHECKOUT) -->
 
  				<!-- CARI Alkes dan Item Terpakai -->
  				<div class="col-md-6 my-1 d-none">
@@ -427,10 +463,10 @@
  							<tbody></tbody>
  						</table>
  					</div>
-					 <div class="row m-0 mt-2 py-2 justify-content-start text-center fw-bold fs-6 total-seluruh-biaya" style="background: #FFE78B;">
-						 <div class="col-12 col-md-6">Total Seluruh Biaya</div>
-						 <div class="col-12 col-md-6">Rp. 0</div>
-					 </div>
+ 					<div class="row m-0 mt-2 py-2 justify-content-start text-center fw-bold fs-6 total-seluruh-biaya" style="background: #FFE78B;">
+ 						<div class="col-12 col-md-6">Total Seluruh Biaya</div>
+ 						<div class="col-12 col-md-6">Rp. 0</div>
+ 					</div>
  				</div>
  				<div class="card-footer p-0"></div>
  			</div>
@@ -662,3 +698,42 @@
  	</div>
  </div>
  <!-- End Modal Checkout Pembayaran -->
+
+ <!-- Modal Cetak Pembayaran -->
+ <div class="modal fade" id="modal-cetak-pay" role="dialog" tabindex="-1" data-bs-backdrop="static" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+ 	<div class="modal-dialog modal-xl" role="document">
+ 		<div class="modal-content">
+ 			<div class="modal-body">
+ 				<div class="row">
+ 					<div class="col-12 p-1">
+ 						<div class="p-1 px-0 rounded">
+ 							<button type="button" class="btn btn-primary text-xs w-100" onclick="cetak_pembayaran()">
+ 								<i class="fas fa-print px-2"></i>
+ 								Cetak Seluruh Faktur
+ 							</button>
+ 						</div>
+ 						<hr class="mt-3 mb-2">
+ 					</div>
+ 				</div>
+ 				<div class="row">
+ 					<div class="col-12">
+ 						<h6 class="text-center fw-bold" style="font-family: sans-serif !important;">Cetak Setiap Faktur</h6>
+ 					</div>
+ 				</div>
+ 				<div class="row list-faktur">
+ 					<div class="col-lg-2 p-1">
+ 						<div class="bg-primary p-1 px-2 rounded text-white shadow-sm">
+ 							<div class="text-xs fw-bold">P/RJ/XX/XX/XXXXX</div>
+ 							<div class="text-xs"><?= date('Y-m-d H:i:s') ?></div>
+ 							<div class="text-xs text-end">xxx</div>
+ 						</div>
+ 					</div>
+ 				</div>
+ 			</div>
+ 			<div class="modal-footer p-1">
+ 				<button type="button" class="btn btn-danger w-100 text-xs" data-bs-dismiss="modal">Tutup</button>
+ 			</div>
+ 		</div>
+ 	</div>
+ </div>
+ <!-- End Modal Cetak Pembayaran -->
